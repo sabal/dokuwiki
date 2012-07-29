@@ -41,7 +41,7 @@ function dw_dir_filter($entry, $basepath) {
         }
         return DW_DIR_NS;
     }
-    if ( preg_match('/\.txt$/',$entry) ) {
+    if ( preg_match('/\.xhtml$/',$entry) ) {
         return DW_DIR_PAGE;
     }
     return DW_DIR_CONTINUE;

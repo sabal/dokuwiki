@@ -198,8 +198,8 @@ function search_media(&$data,$base,$file,$type,$lvl,$opts){
 function search_list(&$data,$base,$file,$type,$lvl,$opts){
     //we do nothing with directories
     if($type == 'd') return false;
-    //only search txt files
-    if(substr($file,-4) == '.txt'){
+    //only search xhtml files
+    if(substr($file,-5) == '.xhtml'){
         //check ACL
         $id = pathID($file);
         if(auth_quickaclcheck($id) < AUTH_READ){
@@ -220,8 +220,8 @@ function search_list(&$data,$base,$file,$type,$lvl,$opts){
 function search_pagename(&$data,$base,$file,$type,$lvl,$opts){
     //we do nothing with directories
     if($type == 'd') return true;
-    //only search txt files
-    if(substr($file,-4) != '.txt') return true;
+    //only search xhtml files
+    if(substr($file,-5) != '.xhtml') return true;
 
     //simple stringmatching
     if (!empty($opts['query'])){
@@ -255,8 +255,8 @@ function search_allpages(&$data,$base,$file,$type,$lvl,$opts){
         return true;
     }
 
-    //only search txt files
-    if(substr($file,-4) != '.txt') return true;
+    //only search xhtml files
+    if(substr($file,-5) != '.xhtml') return true;
 
     $item['id']   = pathID($file);
     if(!$opts['skipacl'] && auth_quickaclcheck($item['id']) < AUTH_READ){
@@ -286,8 +286,8 @@ function search_allpages(&$data,$base,$file,$type,$lvl,$opts){
 function search_backlinks(&$data,$base,$file,$type,$lvl,$opts){
     //we do nothing with directories
     if($type == 'd') return true;
-    //only search txt files
-    if(substr($file,-4) != '.txt') return true;
+    //only search xhtml files
+    if(substr($file,-5) != '.xhtml') return true;
 
     //absolute search id
     $sid = cleanID($opts['ns'].':'.$opts['name']);
@@ -333,8 +333,8 @@ function search_backlinks(&$data,$base,$file,$type,$lvl,$opts){
 function search_fulltext(&$data,$base,$file,$type,$lvl,$opts){
     //we do nothing with directories
     if($type == 'd') return true;
-    //only search txt files
-    if(substr($file,-4) != '.txt') return true;
+    //only search xhtml files
+    if(substr($file,-5) != '.xhtml') return true;
 
     //check ACL
     $id = pathID($file);
@@ -400,8 +400,8 @@ function search_reference(&$data,$base,$file,$type,$lvl,$opts){
     //we do nothing with directories
     if($type == 'd') return true;
 
-    //only search txt files
-    if(substr($file,-4) != '.txt') return true;
+    //only search xhtml files
+    if(substr($file,-5) != '.xhtml') return true;
 
     //we finish after 'cnt' references found. The return value
     //'false' will skip subdirectories to speed search up.
@@ -490,10 +490,10 @@ function sort_search_fulltext($a,$b){
  * @author  Andreas Gohr <andi@splitbrain.org>
  * @todo    move to pageutils
  */
-function pathID($path,$keeptxt=false){
+function pathID($path,$keepxhtml=false){
     $id = utf8_decodeFN($path);
     $id = str_replace('/',':',$id);
-    if(!$keeptxt) $id = preg_replace('#\.txt$#','',$id);
+    if(!$keepxhtml) $id = preg_replace('#\.xhtml$#','',$id);
     $id = trim($id, ':');
     return $id;
 }
@@ -508,7 +508,7 @@ function pathID($path,$keeptxt=false){
  * array, where the following settings can be used.
  *
  * depth      int     recursion depth. 0 for unlimited
- * keeptxt    bool    keep .txt extension for IDs
+ * keepxhtml  bool    keep .xhtml extension for IDs
  * listfiles  bool    include files in listing
  * listdirs   bool    include namespaces in listing
  * pagesonly  bool    restrict files to pages
@@ -532,7 +532,7 @@ function search_universal(&$data,$base,$file,$type,$lvl,$opts){
     $return = true;
 
     // get ID and check if it is a valid one
-    $item['id'] = pathID($file,($type == 'd' || $opts['keeptxt']));
+    $item['id'] = pathID($file,($type == 'd' || $opts['keepxhtml']));
     if($item['id'] != cleanID($item['id'])){
         if($opts['showmsg'])
             msg(hsc($item['id']).' is not a valid file name for DokuWiki - skipped',-1);
@@ -577,7 +577,7 @@ function search_universal(&$data,$base,$file,$type,$lvl,$opts){
     }else{
         if(!$opts['listfiles']) return $return;
         if(!$opts['skipacl'] && $item['perm'] < AUTH_READ) return $return;
-        if($opts['pagesonly'] && (substr($file,-4) != '.txt')) return $return;
+        if($opts['pagesonly'] && (substr($file,-5) != '.xhtml')) return $return;
         if(!$opts['showhidden'] && isHiddenPage($item['id'])) return $return;
         if($opts['filematch'] && !preg_match('/'.$opts['filematch'].'/',$file)) return $return;
         if($opts['idmatch'] && !preg_match('/'.$opts['idmatch'].'/',$item['id'])) return $return;

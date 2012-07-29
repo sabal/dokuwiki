@@ -67,13 +67,13 @@ function p_wiki_xhtml($id, $rev='', $excuse=true){
 
     if($rev){
         if(@file_exists($file)){
-            $ret = p_render('xhtml',p_get_instructions(io_readWikiPage($file,$id,$rev)),$info); //no caching on old revisions
+            $ret = io_readWikiPage($file,$id,$rev);
         }elseif($excuse){
             $ret = p_locale_xhtml('norev');
         }
     }else{
         if(@file_exists($file)){
-            $ret = p_cached_output($file,'xhtml',$id);
+            $ret = io_readWikiPage($file,$id);
         }elseif($excuse){
             $ret = p_locale_xhtml('newpage');
         }
