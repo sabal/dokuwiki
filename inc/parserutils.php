@@ -67,13 +67,14 @@ function p_wiki_xhtml($id, $rev='', $excuse=true){
 
     if($rev){
         if(@file_exists($file)){
-            $ret = io_readWikiPage($file,$id,$rev);
+            require_once DOKU_INC."inc/XHTMLParser.php";
+            $ret = extract_body(io_readWikiPage($file,$id,$rev));
         }elseif($excuse){
             $ret = p_locale_xhtml('norev');
         }
     }else{
         if(@file_exists($file)){
-            $ret = io_readWikiPage($file,$id);
+            $ret = p_cached_content($file);
         }elseif($excuse){
             $ret = p_locale_xhtml('newpage');
         }
@@ -197,6 +198,25 @@ function p_cached_output($file, $format='xhtml', $id='') {
 
     return $parsed;
 }
+
+function p_cached_content($file) {
+    global $conf;
+
+    $cache = new cache_renderer($id, $file, $format);
+    if ($cache->useCache()) {
+        $parsed = $cache->retrieveCache(false);
+        if($conf['allowdebug']) $parsed .= "\n<!-- cachefile {$cache->cache} used -->\n";
+    } else {
+        require_once DOKU_INC."inc/XHTMLParser.php";
+        $parsed = extract_body(io_readWikiPage($file,null,null));
+
+        $cache->storeCache($parsed);               //save cachefile
+        if($conf['allowdebug']) $parsed .= "\n<!-- no cachefile used, but created {$cache->cache} -->\n";
+    }
+
+    return $parsed;
+}
+
 
 /**
  * Returns the render instructions for a file
@@ -504,29 +524,11 @@ function p_render_metadata($id, $orig){
     $orig['page'] = $id;
     $evt = new Doku_Event('PARSER_METADATA_RENDER', $orig);
     if ($evt->advise_before()) {
-
-        require_once DOKU_INC."inc/parser/metadata.php";
-
-        // get instructions
-        $instructions = p_cached_instructions(wikiFN($id),false,$id);
-        if(is_null($instructions)){
-            $ID = $keep;
-            unset($METADATA_RENDERERS[$id]);
-            return null; // something went wrong with the instructions
-        }
-
-        // set up the renderer
-        $renderer = new Doku_Renderer_metadata();
-        $renderer->meta =& $orig['current'];
-        $renderer->persistent =& $orig['persistent'];
-
-        // loop through the instructions
-        foreach ($instructions as $instruction){
-            // execute the callback against the renderer
-            call_user_func_array(array(&$renderer, $instruction[0]), (array) $instruction[1]);
-        }
-
-        $evt->result = array('current'=>&$renderer->meta,'persistent'=>&$renderer->persistent);
+        require_once DOKU_INC."inc/XHTMLParser.php";
+        $current = $orig['current'];
+        $persistent = $orig['persistent'];
+        render_metadata(wikiFN($id), $current, $persistent);
+        $evt->result = array('current'=>&$current,'persistent'=>&$persistent);
     }
     $evt->advise_after();
 

@@ -799,7 +799,8 @@ function rawLocale($id){
  * @author Andreas Gohr <andi@splitbrain.org>
  */
 function rawWiki($id,$rev=''){
-    return io_readWikiPage(wikiFN($id, $rev), $id, $rev);
+    require_once DOKU_INC."inc/XHTMLParser.php";
+    return extract_body(io_readWikiPage(wikiFN($id, $rev), $id, $rev));
 }
 
 /**
@@ -1018,6 +1019,7 @@ function saveWikiText($id,$text,$summary,$minor=false){
         io_sweepNS($id, 'datadir');
         io_sweepNS($id, 'mediadir');
     }else{
+        $text = replace_body(io_readWikiPage($file, $id), $text);
         // save file (namespace dir is created in io_writeWikiPage)
         io_writeWikiPage($file, $text, $id);
         // pre-save the revision, to keep the attic in sync
