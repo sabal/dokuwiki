@@ -1,5 +1,32 @@
 <?php
 
+function search_springnote(&$data, $base, $func, $opts, $dir, $lvl, $sort) {
+    global $conf;
+
+    // XXX: assumes $data is empty
+
+    $xml = new XMLReader;
+    $xml->open($conf['metadir'].'/_tree.xml');
+    while ($xml->read()) {
+        if ($xml->nodeType !== XMLReader::ELEMENT)
+            continue;
+        if ($xml->name !== 'page')
+            continue;
+
+        $item = array();
+        $item['id'] = $xml->getAttribute('id');
+        $item['ns'] = $xml->getAttribute('path');
+        $item['title'] = $xml->getAttribute('title');
+        if ($item['ns'] === '')
+            $item['level'] = 1;
+        else
+            $item['level'] = 1 + sizeof(explode(':', $item['ns']));
+        $item['type'] = 'f';
+
+        $data[] = $item;
+    }
+}
+
 // FIXME: use more robust parser
 
 function _replace_entity($xhtml) {

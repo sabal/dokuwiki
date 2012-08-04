@@ -22,6 +22,13 @@ if(!defined('DOKU_INC')) die('meh.');
  * @author  Andreas Gohr <andi@splitbrain.org>
  */
 function search(&$data,$base,$func,$opts,$dir='',$lvl=1,$sort=false){
+    global $conf;
+    if(strpos($base, $conf['datadir']) === 0 &&
+            $func == 'search_index') {
+        require_once DOKU_INC."inc/sabal/sabal.php";
+        return search_springnote($data, $base, $func, $opts, $dir, $lvl, $sort);
+    }
+
     $dirs   = array();
     $files  = array();
     $filepaths = array();

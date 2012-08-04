@@ -67,7 +67,7 @@ function p_wiki_xhtml($id, $rev='', $excuse=true){
 
     if($rev){
         if(@file_exists($file)){
-            require_once DOKU_INC."inc/XHTMLParser.php";
+            require_once DOKU_INC."inc/sabal/sabal.php";
             $ret = extract_body(io_readWikiPage($file,$id,$rev));
         }elseif($excuse){
             $ret = p_locale_xhtml('norev');
@@ -207,7 +207,7 @@ function p_cached_content($file) {
         $parsed = $cache->retrieveCache(false);
         if($conf['allowdebug']) $parsed .= "\n<!-- cachefile {$cache->cache} used -->\n";
     } else {
-        require_once DOKU_INC."inc/XHTMLParser.php";
+        require_once DOKU_INC."inc/sabal/sabal.php";
         $parsed = extract_body(io_readWikiPage($file,null,null));
 
         $cache->storeCache($parsed);               //save cachefile
@@ -524,7 +524,7 @@ function p_render_metadata($id, $orig){
     $orig['page'] = $id;
     $evt = new Doku_Event('PARSER_METADATA_RENDER', $orig);
     if ($evt->advise_before()) {
-        require_once DOKU_INC."inc/XHTMLParser.php";
+        require_once DOKU_INC."inc/sabal/sabal.php";
         $current = $orig['current'];
         $persistent = $orig['persistent'];
         render_metadata(wikiFN($id), $current, $persistent);
