@@ -799,7 +799,7 @@ function rawLocale($id){
  * @author Andreas Gohr <andi@splitbrain.org>
  */
 function rawWiki($id,$rev=''){
-    require_once DOKU_INC."inc/XHTMLParser.php";
+    require_once DOKU_INC."inc/sabal/sabal.php";
     return extract_body(io_readWikiPage(wikiFN($id, $rev), $id, $rev));
 }
 
