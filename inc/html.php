@@ -867,11 +867,11 @@ function html_list_index($item){
  */
 function html_li_index($item){
     if($item['type'] == "f"){
-        return '<li class="level'.$item['level'].'">';
+        return '<li id="node_'.$item['id'].'" class="level'.$item['level'].'">';
     }elseif($item['open']){
-        return '<li class="open">';
+        return '<li id="node_'.$item['id'].'" class="open">';
     }else{
-        return '<li class="closed">';
+        return '<li id="node_'.$item['id'].'" class="closed">';
     }
 }
 
@@ -881,7 +881,7 @@ function html_li_index($item){
  * @author Andreas Gohr <andi@splitbrain.org>
  */
 function html_li_default($item){
-    return '<li class="level'.$item['level'].'">';
+    return '<li id="node_'.$item['id'].'" class="level'.$item['level'].'">';
 }
 
 /**
@@ -936,10 +936,8 @@ function html_buildlist($data,$class,$func,$lifunc='html_li_default',$forcewrapp
 
         //print item
         $ret .= call_user_func($lifunc,$item);
-        $ret .= '<div class="li">';
 
         $ret .= call_user_func($func,$item);
-        $ret .= '</div>';
     }
 
     //close remaining items and lists
